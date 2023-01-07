@@ -104,12 +104,12 @@ while i < maxrow+1 :
     y_point2 = final_sheet.cell(row=i+1, column=3)
     if num1.value == num2.value:
         result = '{1,' + str(x_point1.value) + ',' + str(y_point1.value) + ',' + str(x_point2.value) + ',' + str(y_point2.value) + ',0},\n'
+        f.write(result)
     else:
         # result = '};\nu16 point' + str(t) + '[4][6]={\n'
         # t += 1
         pass
-    print(num1.value,num2.value,'\n')
-    f.write(result)
+#     print(num1.value,num2.value,'\n')    
     i += 1
 
 f.write('};')
