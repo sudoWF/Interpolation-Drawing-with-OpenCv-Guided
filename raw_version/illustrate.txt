@@ -1,0 +1,3 @@
+最初的测试版本
+运行顺序：
+py1——py2——py3——把final.txt的点复制到DDAHello.c里面，修改points[i][3]参数和主循环轮廓数（final里的第一个参数最大值+1）
