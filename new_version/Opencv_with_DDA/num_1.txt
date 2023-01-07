@@ -1,0 +1,155 @@
+#include <stdio.h>
+
+//=================================================================================
+//以下内容无需移植 
+typedef unsigned char u8; 
+typedef unsigned int u16; 
+
+u8 PenStatus = 0;  //笔的状态，0--抬起，1--放下 
+FILE *fp;
+
+
+//延时函数，为确保与单片机一致，这里放一个空函数
+void delay_ms(u16 time)
+{
+	return;
+}
+//读取键盘输入，仿真时用电脑键盘代替开发板键盘 
+char key()
+{
+	char str = 0;
+	
+	str = getch();
+	return str; 
+}
+//改变笔的状态 
+void SetTim4Pwm(u8 chn,u16 angle)	//抬起笔
+{
+	if(angle > 120)  //抬笔
+		PenStatus = 0; 
+	else PenStatus = 1;  
+}
+
+//X电机驱动函数，这里替换为生成数据保存用于观察 
+void MotorXDriver(u16 plus,u8 dir,u16 time)
+{
+	u16 i;
+
+	fprintf(fp,"x,%d,%d,%d\n", plus,dir,PenStatus);
+}
+//Y电机驱动函数，这里替换为生成数据保存用于观察 
+void MotorYDriver(u16 plus,u8 dir,u16 time)
+{
+	u16 i;
+
+	fprintf(fp,"y,%d,%d,%d\n", plus,dir,PenStatus);
+}
+//=================================================================================
+//以下内容仿真成功后移植到开发板 
+//移动函数
+void Move(u16 x0,u16 y0,u16 x1,u16 y1)
+{
+	//抬起笔
+	SetTim4Pwm(1,180);
+	delay_ms(50);
+
+	//先X方向移动
+	if(x1>=x0)
+		MotorXDriver(x1-x0,0,100);
+	else MotorXDriver(x0-x1,1,100);
+	
+	//再Y方向移动
+	if(y1>=y0)
+		MotorYDriver(y1-y0,0,100);
+	else MotorYDriver(y0-y1,1,100);
+}
+
+
+
+
+
+
+
+
+
+////画直线函数
+//void DrawLine(int x0,int y0,int x1,int y1)
+//{
+//	//定义局部变量
+//	u16 xplus = 0;  //X轴每次要走的步数
+//	u16 xdir = 0;	 //X轴每次要走的方向	
+//	u16 yplus = 0;  //Y轴每次要走的步数
+//	u16 ydir = 0;    //Y轴每次要走的方向
+//	u16 x = 0 ,y = 0; 
+//	u16 dx = 0 ,dy = 0;
+//	u16 t = 0;
+//	
+
+
+
+
+void DrawLine(int x0, int y0, int xn, int yn)
+{
+	//定义斜率K
+	int dx = xn - x0;
+	int dy = yn - y0;
+	int xplus = 0;  //X轴每次要走的步数
+	int xdir = 0;	 //X轴每次要走的方向	
+	int yplus = 0;  //Y轴每次要走的步数
+	int ydir = 0;    //Y轴每次要走的方向
+	int x = x0 ,y = y0; 
+	int steps;//步数
+	
+	
+	if (abs(dx) > abs(dy))                         
+	{
+		steps = abs(dx);//步数
+	}
+	else
+	{
+		steps = abs(dy);
+	}
+	
+	int k;
+	for (k = 1; k <= steps; ++k)
+	{
+		int xplus = fabs(x0+k*dx/steps-x);
+		int yplus = fabs(y0+k*dy/steps-y);
+		if(dx<0)
+		{
+			xdir = 1;
+			x = x - xplus;
+		}
+		else
+		{
+			xdir = 0;
+			x = x + xplus;
+		} 
+	
+		if(dy<0)
+		{	
+			ydir = 1;
+			y = y - yplus;
+		}
+		else
+		{
+			ydir = 0;
+			y = y + yplus;
+		} 
+		MotorXDriver(xplus,xdir,100);
+		MotorYDriver(yplus,ydir,100);
+		printf("%d,%d\n",x,y);
+	}
+}
+
+
+
+int main(void)
+{	
+	int x =0 ,y = 0;   //定义初始坐标
+	int i =0 ,j = 0;
+	int n;
+	u8 key_num;
+	
+	//定义要走的路径
+	int point[

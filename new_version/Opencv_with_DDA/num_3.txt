@@ -1,0 +1,42 @@
+;n++)
+			{
+
+				SetTim4Pwm(1,90);	 //放下笔
+				delay_ms(50);
+				
+				while(n==point[i+1][0])
+				{
+					printf("正在处理第%d条路径\n",i);  //仿真专用，无需移植到单片机
+					
+					//开始绘制
+					DrawLine(point[i][1],point[i][2],point[i+1][1],point[i+1][2]);	
+								
+					//更新当前坐标
+					x = point[i+1][1];
+					y = point[i+1][1];
+					i++;
+				}
+				printf("正在处理第%d条路径\n",i);  //仿真专用，无需移植到单片机
+				DrawLine(point[i][1],point[i][2],point[j][1],point[j][2]);
+				i++;
+				
+				//printf(i);
+				
+				//抬起笔
+				//SetTim4Pwm(1,180);	
+				//delay_ms(50);
+				 
+				
+				//移动到起点
+				Move(point[j][1],point[j][2],point[i][1],point[i][2]);
+				
+				j = i;
+			}
+			
+			fclose(fp); //仿真专用，无需移植到单片机 
+			printf("处理完成\n"); //仿真专用，无需移植到单片机 
+		}
+	}
+	
+    return 0;
+}
